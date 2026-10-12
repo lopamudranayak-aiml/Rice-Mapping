@@ -1,93 +1,62 @@
-# Bahanaga Paddy Rice Mapping (Kharif 2025)
+# Paddy Rice Mapping Pipeline
 
-Reproducible Google Earth Engine pipeline for mapping paddy rice in Bahanaga, Odisha using a simplified FARM-style approach (Sentinel-1 + Sentinel-2 + Random Forest).
+Google Earth Engine pipeline to map paddy rice using Sentinel-1 and Sentinel-2.
 
-## What this produces
+## What you get
 
-- 10 m binary rice map (raster GeoTIFF)
-- Optional vector (Shapefile) of rice polygons
-- Intermediate Sentinel-1 feature stack
+- 10 m binary rice map (GeoTIFF)
+- Optional shapefile of rice polygons
+- Sentinel-1 feature stack (intermediate asset)
 
 ## Requirements
 
-- Google Earth Engine account with access to:
-  - `COPERNICUS/S1_GRD`
-  - `COPERNICUS/S2_SR_HARMONIZED`
-  - `COPERNICUS/S2_CLOUD_PROBABILITY`
-- Ability to create assets under your own GEE project (or use the provided project if shared)
+- Google Earth Engine account
+- Access to Sentinel-1 and Sentinel-2 collections
+- Permission to create assets in your GEE project
 - Google Drive (for exports)
 
-## Repository layout
+## Folder structure
 
 ```
-bahanaga-rice-mapping/
-├── README.md                 ← this file
-├── gee/
-│   ├── 01_generate_s1_features.js
-│   ├── 02_classify_rice.js
-│   └── config.js             ← edit AOI, year, thresholds here
-├── docs/
-│   └── METHOD.md             ← short method description
-└── presentation/
-    └── 15min_outline.md      ← 15-minute talk structure
+├── README.md
+└── gee/
+    ├── config.js
+    ├── 01_generate_s1_features.js
+    └── 02_classify_rice.js
 ```
 
-## Quick start (another engineer)
+## How to run
 
-### 1. Clone / copy this folder
-
-### 2. Edit configuration
+### 1. Edit config
 
 Open `gee/config.js` and set:
 
-- Your AOI asset (Image or FeatureCollection)
+- AOI asset path
 - Year
-- Output asset / Drive folder names
-- Thresholds (defaults are tuned for Bahanaga 2025)
+- Output asset path and Drive folder
+- Thresholds (if needed)
 
-### 3. Run Step 1 – Generate S1 features
+### 2. Generate Sentinel-1 features
 
-1. Open `gee/01_generate_s1_features.js` in the [Earth Engine Code Editor](https://code.earthengine.google.com/)
-2. Paste / load the script
-3. Click **Run**
-4. Go to **Tasks** → run the export
-5. Wait until the asset `s1features_...` is created
+1. Open `gee/01_generate_s1_features.js` in the Earth Engine Code Editor
+2. Run the script
+3. Go to **Tasks** → start the export
+4. Wait until the feature asset is created
 
-### 4. Run Step 2 – Classify rice
+### 3. Classify rice
 
 1. Open `gee/02_classify_rice.js`
-2. Confirm the S1 feature asset path matches what Step 1 created
-3. Click **Run**
-4. Inspect the `final_rice` layer
-5. Run the export tasks (GeoTIFF and/or Shapefile)
+2. Check that the S1 feature asset path matches Step 2
+3. Run the script
+4. Check the `final_rice` layer on the map
+5. Start the export tasks (raster and/or shapefile)
 
-### 5. Download outputs
+### 4. Download results
 
-- Google Drive → folder specified in config (default: `GEE_exports`)
-- Open GeoTIFF / Shapefile in QGIS for visual check
+From Google Drive (folder set in config), download the GeoTIFF and/or Shapefile and open in QGIS.
 
-## Accuracy note
+## Notes
 
-**No independent accuracy assessment was performed in the original run.**
-
-- Training samples were generated automatically from Sentinel-1 rules.
-- There was no held-out ground-truth set.
-- Reported numbers (if any) from a train/test split of automatic samples are optimistic and should not be treated as map accuracy.
-
-To compute proper accuracy you need independent validation points (field points or carefully digitized points). See `docs/METHOD.md` and the presentation outline for recommended next steps.
-
-## Limitations (short)
-
-- Relies on a clear temporary flooding signal (typical of transplanted rice).
-- Thresholds were tuned for Bahanaga; other regions need re-tuning.
-- Optical periods can be cloudy; radar helps but does not fully replace optical refinement.
-- Simplified pipeline (no SNIC object-based step) for memory stability on larger AOIs.
-
-## Citation / method basis
-
-Inspired by the FARM (Fully Automated Rice Mapping) framework using Sentinel-1 phenology + Sentinel-2 multi-temporal classification.
-
-## Contact / ownership
-
-Original analysis performed for Bahanaga, Odisha (Kharif 2025).  
-Adapt `config.js` and asset paths for new areas.
+- Training samples are created automatically from Sentinel-1 rules. There is no independent accuracy assessment in this pipeline.
+- Thresholds may need adjustment for a new area.
+- For a new region, update the AOI, year, and phenology dates in `config.js`.
